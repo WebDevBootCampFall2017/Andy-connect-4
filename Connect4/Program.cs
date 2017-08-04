@@ -43,7 +43,7 @@ namespace Connect4
             char[,] map;//  char[7,6] represents the board.
             int turns;
             const int max_turns = 42;
-
+            bool win = false;
 
             public const char empty = ' ';
 
@@ -58,6 +58,7 @@ namespace Connect4
                     }
                 }
                 turns = 0;      //0 turns have been taken.  42 is max number of turns (7*6)
+                win = false;
             }
 
             // other methods
@@ -82,6 +83,8 @@ namespace Connect4
                             map[x, y] = mover;     //assign this spot to player
                             turns++;
                             valid = true;
+                            check_for_win(x,y);        //check to see if this move was a winner
+
                         }
                     }
                 }
@@ -104,12 +107,208 @@ namespace Connect4
                 }
             }
 
-            public bool check_for_win()
+            void check_for_win(int x, int y)
             {
-                bool win = false;
-                //do check here.
-                return win;
+                int i = 0;
+                int j = 0;
+                char token = map[x,y];  //x and y are good coords from the move method
+                //bool wins = false;
+                int[] lengths = { 0, 0, 0, 0, 0, 0, 0, 0 };  //holds the length of matching locations on the map in each direction
+                /*
+                lengths[0]=up
+                       [1]=up-right
+                       [2]=right
+                       [3]=down-right
+                       [4]=down
+                       [5]=down-left
+                       [6]=left
+                       [7]=up-left
+                */
+                //check up
+                for (int c = 1; c <= 3; c++)     //only need to check up to 3 spaces in each direction
+                {   
+                    if ((y + c) < 6)
+                    {
+                        if (map[x, y + c] == token)
+                        {
+                            lengths[0]++;
+                        } else
+                        {
+                            break;  //it doesn't match, so the streak ends here
+                        }
+                    }
+                    else
+                    {
+                        break;  //we reached the edge of the map.  no need to keep going.
+                    }
+                }
+                //check up-right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((x + c) < 7) && ((y + c) < 6))
+                    {
+                        if (map[x+c,y+c]==token)
+                        {
+                            lengths[1]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if ((x + c) < 7) 
+                    {
+                        if (map[x + c, y] == token)
+                        {
+                            lengths[2]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check down-right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((x + c) < 7) && ((y -c) >=0 ))
+                    {
+                        if (map[x + c, y - c] == token)
+                        {
+                            lengths[3]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check down
+                for (int c = 1; c <= 3; c++)     
+                {
+                    if ((y - c) >= 0)
+                    {
+                        if (map[x, y - c] == token)
+                        {
+                            lengths[4]++;
+                        }
+                        else
+                        {
+                            break;  
+                        }
+                    }
+                    else
+                    {
+                        break;  
+                    }
+                }
+                //check down-left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((x - c) >= 0) && ((y - c) >= 0))
+                    {
+                        if (map[x - c, y - c] == token)
+                        {
+                            lengths[5]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if ((x - c) >= 0)
+                    {
+                        if (map[x - c, y] == token)
+                        {
+                            lengths[6]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check up-left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((x - c) >= 0) && ((y + c) < 6))
+                    {
+                        if (map[x - c, y + c] == token)
+                        {
+                            lengths[7]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check the lengths
+                /*
+                lengths[0]=up
+                       [1]=up-right
+                       [2]=right
+                       [3]=down-right
+                       [4]=down
+                       [5]=down-left
+                       [6]=left
+                       [7]=up-left
+                */
+                //up + down (+1 for this spot)  if its 4 or more its a win
+                if (lengths[0] + lengths[4] +1 >= 4)
+                {
+                    win = true;
+                }
+                //up-right + down-left
+                if (lengths[1] + lengths[5] + 1 >= 4)
+                {
+                    win = true;
+                }
+                //right + left
+                if (lengths[2] + lengths[6] + 1 >= 4)
+                {
+                    win = true;
+                }
+                //down-right + up-left
+                if (lengths[3] + lengths[7] + 1 >= 4)
+                {
+                    win = true;
+                }
             }
+
+            public bool get_win() { return win; }
 
             public void display_win(char game_player, Game g)
             {
@@ -128,6 +327,7 @@ namespace Connect4
                         break;
                 }
             }
+
             public bool check_col(int x, Game g)
             {                               //returns true if column is not full.  False if it is full.
                 bool full = false;
@@ -140,6 +340,7 @@ namespace Connect4
                 }
                 return full;
             }
+
             public int get_turns()
             {
                 return turns;
@@ -156,13 +357,205 @@ namespace Connect4
                 Console.Write("It's a draw!");                
             }
 
+            public int check_move(int column, char token)
+            {
+                //this function does essentially what Game.check_for_win() does, but for a blank space, and for a specified side (computer or player).
+                //It checks the first blank space going up column column.  This is called before making a move.
+                //This function returns the longest streak of mathing squares that would result in moving here.  4 or more = win!
+                //minimum good value is 1, the space in question by itself.  max is 7, but unlikely.
+                //returns 0 if column is full.
+                int len = 0;
+                int[] lens = new int[8];
+                for (int z = 0; z < 8; z++) { lens[z] = 0; }
+                //find row
+                int row = 0;
+                while(map[column,row]!=' ') { row++; if (row == 6) { break; } }
+                if (row == 6) { return len; }
+                //do the checks
+                //check up
+                for (int c = 1; c <= 3; c++)     //only need to check up to 3 spaces in each direction
+                {
+                    if ((row + c) < 6)
+                    {
+                        if (map[column, row + c] == token)
+                        {
+                            lens[0]++;
+                        }
+                        else
+                        {
+                            break;  //it doesn't match, so the streak ends here
+                        }
+                    }
+                    else
+                    {
+                        break;  //we reached the edge of the map.  no need to keep going.
+                    }
+                }
+                //check up-right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((column + c) < 7) && ((row + c) < 6))
+                    {
+                        if (map[column + c, row + c] == token)
+                        {
+                            lens[1]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if ((column + c) < 7)
+                    {
+                        if (map[column + c, row] == token)
+                        {
+                            lens[2]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check down-right
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((column + c) < 7) && ((row - c) >= 0))
+                    {
+                        if (map[column + c, row - c] == token)
+                        {
+                            lens[3]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check down
+                for (int c = 1; c <= 3; c++)
+                {
+                    if ((row - c) >= 0)
+                    {
+                        if (map[column, row - c] == token)
+                        {
+                            lens[4]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check down-left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((column - c) >= 0) && ((row - c) >= 0))
+                    {
+                        if (map[column - c, row - c] == token)
+                        {
+                            lens[5]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if ((column - c) >= 0)
+                    {
+                        if (map[column - c, row] == token)
+                        {
+                            lens[6]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check up-left
+                for (int c = 1; c <= 3; c++)
+                {
+                    if (((column - c) >= 0) && ((row + c) < 6))
+                    {
+                        if (map[column - c, row + c] == token)
+                        {
+                            lens[7]++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //check the lengths
+                /*
+                lengths[0]=up
+                       [1]=up-right
+                       [2]=right
+                       [3]=down-right
+                       [4]=down
+                       [5]=down-left
+                       [6]=left
+                       [7]=up-left
+                */
+                // take the largest
+                //up + down 
+                if ((lens[0] + lens[4])>len) { len = lens[0] + lens[4]; }
+               
+                //up-right + down-left
+                if ((lens[1] + lens[5])>len) { len = lens[1] + lens[5]; }
+                
+                //right + left
+                if ((lens[2] + lens[6]) > len) { len = lens[2] + lens[6]; }
+                
+                //down-right + up-left
+                if ((lens[3] + lens[7]) > len) { len = lens[3] + lens[7]; }
+                
+                return len+1;
+            }
         }
-            public abstract class Player
+        public abstract class Player
             {
                 abstract public void take_turn();
             }
-
-
+        
         class User : Player
         {
             public const char player = 'p';
@@ -211,14 +604,100 @@ namespace Connect4
         class Computer : Player
         {
             public const char computer = 'c';
+            public const char enemy = 'p';
+
             Game g;
 
             public Computer(Game game) { g = game; }
 
             public override void take_turn()
             {
+                int[] moves = { 0, 0, 0, 0, 0, 0, 0 };  //score for moving into each column
+                int selected_column = 0;
+                int[] choices = new int[7];          //will hold the choice or choices  for where to move.
 
+                for (int x = 0; x < 7; x++) 
+                {
+                    //first, see which move gives best chance at a win
+                    int len = g.check_move(x, computer);
+                    switch (len)
+                    {
+                        case 0:     //column is full.  Can not move here.
+                            moves[x] = -1;
+                            break;
+                        case 1:     //nothing around it.  not great.
+                            moves[x] = 25;
+                            break;
+                        case 2:     //there is a match, but nothing spectacular.  only 2 in row.
+                            moves[x] = 50;
+                            break;
+                        case 3:     //there is some real possibility here.  3 in row.
+                            moves[x] = 75;
+                            break;
+                        case 4:     //this is a win!  go here!
+                            moves[x] = 1000;
+                            break;
+                        default:    //len is either negative or greater than 4 -- awesome or broken.
+                            if (len > 4)
+                            {
+                                moves[x] = 1000;  //an even better win
+                            } else
+                            {
+                                moves[x] = -1;  //I don't know hpw we got here, but don't move here
+                            }
+                            break;
+                    }
+                    // now see which moves benefit the enemy
+                    len = g.check_move(x, enemy);
+                    switch (len)
+                    {
+                        case 0:     //column is full.  Can not move here.
+                            //moves[x] = -1;
+                            break;
+                        case 1:     //nothing around it.  not great.
+                            if (moves[x] > 25) { moves[x] -= 25; } else { moves[x] = 0; }
+                            break;
+                        case 2:     //there is a match, but nothing spectacular.  only 2 in row.
+                            if (moves[x] > 50) { moves[x] -= 50; } else { moves[x] = 0; }
+                            break;
+                        case 3:     //there is some real possibility here.  3 in row.
+                            if (moves[x] > 75) { moves[x] -= 75; } else { moves[x] = 0; }
+                            break;
+                        case 4:     //this is a win for the other guy!  Go here to block!
+                            moves[x] = 1000;
+                            break;
+                        default:    //len is either negative or greater than 4 -- awesome or broken.
+                            if (len > 4)
+                            {
+                                moves[x] = 1000;  //an even better win for the other guy-->  bigger block.
+                            }
+                            else
+                            {
+                                moves[x] = -1;  //I don't know hpw we got here, but don't move here
+                            }
+                            break;
+                    }
+                }
+                //now take the best.
+                int max = 0;
+                int count = 0;
+
+                for (int i = 0; i < 7; i++) { if (moves[i] > max) { max = moves[i]; } }     //get the highest score in max
+                //couont how many moves scored that high.  Put the index into choices
+                for (int j = 0; j < 7; j++) { if (moves[j] == max) { count++; choices[count - 1] = j; } }           
+                if (count > 1)
+                {
+                    //we have more than one move that scored well.  we will pick at random from among these moves.
+                    Random r = new Random();
+                    selected_column  = (int)(r.NextDouble() * 1000) % count;  //this should return an int from 0 to count-1.  that is the index in choices that we want.
+                }
+                else    //if there is only one
+                {
+                    selected_column = choices[0];
+                }
+                g.move(choices[selected_column], computer);
             }
+                       
         }
         
         static void Main(string[] args)
@@ -226,34 +705,23 @@ namespace Connect4
             Game g = new Game();        //keeps the game state, and is initialized by the constructor, so we are already good to go
             User p = new User(g);        //represents the user player
             Computer c = new Computer(g);//represents the computer player
-
-            //for debug use
-            Game.draw_map(g);
-            do
-            {
-                p.take_turn();
-                if (g.get_turns() == g.get_max_turns())
-                {
-                    g.display_draw(g);
-                    break;
-                }
-            } while (g.get_turns() < g.get_max_turns());
-
-
-            /*  main loop
+           
+            //  main loop
             while (g.get_turns() < g.get_max_turns())
             {
                 p.take_turn();
-                if (g.check_for_win())
+                if (g.get_win())
                 {
-                    g.display_win(User.player);
+                    g.display_win(User.player, g);
+                    break;
                 }
                 c.take_turn();
-                if (g.check_for_win())
+                if (g.get_win())
                 {
-                    g.display_win(Computer.computer);
+                    g.display_win(Computer.computer, g);
+                    break;
                 }
-            } */
+            } 
             Console.ReadKey();
         }
     }
