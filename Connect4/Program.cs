@@ -320,10 +320,10 @@ namespace Connect4
                         break;
                     case Computer.computer:
                        Game.draw_map(g);
-                        Console.Write("\nI'm sorry, but yoou lost.\n");
+                        Console.Write("\nI'm sorry, but you lost.\n");
                         break;
                     default:
-                        Console.Write("What?  This should't have happerned.  Who won?");
+                        Console.Write("What?  This should't have happened.  Who won?");
                         break;
                 }
             }
@@ -681,7 +681,7 @@ namespace Connect4
                 //now take the best.
                 int max = 0;
                 int count = 0;
-
+                int choice = 0;
                 for (int i = 0; i < 7; i++) { if (moves[i] > max) { max = moves[i]; } }     //get the highest score in max
                 //couont how many moves scored that high.  Put the index into choices
                 for (int j = 0; j < 7; j++) { if (moves[j] == max) { count++; choices[count - 1] = j; } }           
@@ -689,13 +689,14 @@ namespace Connect4
                 {
                     //we have more than one move that scored well.  we will pick at random from among these moves.
                     Random r = new Random();
-                    selected_column  = (int)(r.NextDouble() * 1000) % count;  //this should return an int from 0 to count-1.  that is the index in choices that we want.
+                    choice  = (int)(r.NextDouble() * 1000) % count;  //this should return an int from 0 to count-1.  that is the index in choices that we want.
+                    selected_column = choices[choice];
                 }
                 else    //if there is only one
                 {
                     selected_column = choices[0];
                 }
-                g.move(choices[selected_column], computer);
+                g.move(selected_column, computer);
             }
                        
         }
