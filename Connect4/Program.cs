@@ -100,7 +100,20 @@ namespace Connect4
                     Console.Write("\t|");
                     for (int x = 0; x < 7; x++)
                     {
-                        Console.Write(" {0} |", g.map[x, y]);
+                        switch (g.map[x, y])
+                        {
+                            case 'c':
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                break;
+                            case 'p':
+                                Console.ForegroundColor = ConsoleColor.White;
+                                break;
+                            default:
+                                break;
+                        }
+                        Console.Write(" {0} ", g.map[x, y]);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("|");
                     }
                     Console.Write("\n");
                     Console.Write(separator);
@@ -710,6 +723,7 @@ namespace Connect4
             //  main loop
             while (g.get_turns() < g.get_max_turns())
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 p.take_turn();
                 if (g.get_win())
                 {
