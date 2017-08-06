@@ -44,8 +44,14 @@ namespace Connect4
             int turns;
             const int max_turns = 42;
             bool win = false;
-
+            public const ConsoleColor board = ConsoleColor.Green;
+            public const ConsoleColor playerColor = ConsoleColor.Black;
+            public const ConsoleColor compColor = ConsoleColor.Red;
+            public const ConsoleColor bgboard = ConsoleColor.White;
+            public const ConsoleColor bg = ConsoleColor.Black;
             public const char empty = ' ';
+            public const char player = '@';
+            public const char comp = '+';
 
             public Game()       //constructor
             {
@@ -68,7 +74,7 @@ namespace Connect4
                 //  Returns true if the move was successful.  If bad input or the column is full, returns false
 
                 bool valid = false;
-                if ((mover == User.player) || (mover == Computer.computer))      //check that the mover is a valid choice
+                if ((mover == Game.player) || (mover == Game.comp))      //check that the mover is a valid choice
                 {
                     if ((x >= 0) && (x < 7))        //check that x is in range
                     {
@@ -93,20 +99,28 @@ namespace Connect4
 
             static public void draw_map(Game g)
             {
-                string separator = "\t|---------------------------|\n";
-                Console.Write("\n\n" + separator);   //top line
+                Console.ForegroundColor = board;
+                Console.BackgroundColor = bg;
+                string separator = "|---------------------------|\n";
+                Console.Write("\n\n\t");
+                Console.BackgroundColor = bgboard;
+                Console.Write(separator);   //top line
                 for (int y = 5; y >= 0; y--)
                 {
-                    Console.Write("\t|");
+                    Console.BackgroundColor = bg;
+                    Console.Write("\t");
+                    Console.BackgroundColor = bgboard;
+                    Console.Write("|");
                     for (int x = 0; x < 7; x++)
                     {
                         switch (g.map[x, y])
                         {
-                            case 'c':
-                                Console.ForegroundColor = ConsoleColor.Red;
+                            case Game.comp:
+                                Console.ForegroundColor = compColor;
                                 break;
-                            case 'p':
-                                Console.ForegroundColor = ConsoleColor.White;
+                            case Game.player:
+                                Console.ForegroundColor = playerColor
+                                    ;
                                 break;
                             default:
                                 break;
@@ -115,15 +129,18 @@ namespace Connect4
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("|");
                     }
-                    Console.Write("\n");
+                    Console.BackgroundColor = bg;
+                    Console.Write("\n\t");
+                    Console.BackgroundColor = bgboard;
                     Console.Write(separator);
+                    Console.BackgroundColor = bg;
                 }
             }
 
             void check_for_win(int x, int y)
             {
-                int i = 0;
-                int j = 0;
+                //int i = 0;
+                //int j = 0;
                 char token = map[x,y];  //x and y are good coords from the move method
                 //bool wins = false;
                 int[] lengths = { 0, 0, 0, 0, 0, 0, 0, 0 };  //holds the length of matching locations on the map in each direction
@@ -327,11 +344,11 @@ namespace Connect4
             {
                 switch (game_player)
                 {
-                    case User.player:
+                    case Game.player:
                         Game.draw_map(g);
                         Console.Write("\nCongratulations!  You won!\n");
                         break;
-                    case Computer.computer:
+                    case Game.comp:
                        Game.draw_map(g);
                         Console.Write("\nI'm sorry, but you lost.\n");
                         break;
@@ -571,7 +588,7 @@ namespace Connect4
         
         class User : Player
         {
-            public const char player = 'p';
+            //public const char player = 'p';
             Game g;
 
             public User(Game game) { g = game; }
@@ -608,7 +625,7 @@ namespace Connect4
                             }
                         }
                     } while (!good_input);
-                    g.move(x-1, player);
+                    g.move(x-1, Game.player);
                     valid = true;
                 }
             }
@@ -616,8 +633,8 @@ namespace Connect4
 
         class Computer : Player
         {
-            public const char computer = 'c';
-            public const char enemy = 'p';
+            //public const char computer = 'c';
+            //public const char enemy = 'p';
 
             Game g;
 
@@ -632,7 +649,7 @@ namespace Connect4
                 for (int x = 0; x < 7; x++) 
                 {
                     //first, see which move gives best chance at a win
-                    int len = g.check_move(x, computer);
+                    int len = g.check_move(x, Game.comp);
                     switch (len)
                     {
                         case 0:     //column is full.  Can not move here.
@@ -661,7 +678,7 @@ namespace Connect4
                             break;
                     }
                     // now see which moves benefit the enemy
-                    len = g.check_move(x, enemy);
+                    len = g.check_move(x, Game.player);
                     switch (len)
                     {
                         case 0:     //column is full.  Can not move here.
@@ -709,7 +726,7 @@ namespace Connect4
                 {
                     selected_column = choices[0];
                 }
-                g.move(selected_column, computer);
+                g.move(selected_column, Game.comp);
             }
                        
         }
@@ -723,17 +740,19 @@ namespace Connect4
             //  main loop
             while (g.get_turns() < g.get_max_turns())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
+                //
+                //Console.ForegroundColor = Game.board;
+                Console.BackgroundColor = Game.bg;
                 p.take_turn();
                 if (g.get_win())
                 {
-                    g.display_win(User.player, g);
+                    g.display_win(Game.player, g);
                     break;
                 }
                 c.take_turn();
                 if (g.get_win())
                 {
-                    g.display_win(Computer.computer, g);
+                    g.display_win(Game.comp, g);
                     break;
                 }
             } 
