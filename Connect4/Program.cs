@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ namespace Connect4
             char[,] map;//  char[7,6] represents the board.
             int turns;
             const int max_turns = 42;
+
             bool win = false;
             public const ConsoleColor board = ConsoleColor.Green;
             public const ConsoleColor playerColor = ConsoleColor.Black;
@@ -68,6 +70,33 @@ namespace Connect4
             }
 
             // other methods
+            public void log_game()
+            {
+                String result;
+                result = "|---------------------------|\r\n";
+                for (int i = 0; i < 7; i++)
+                {
+                    result += "|---------------------------|\r\n";
+                    result += "|";
+                    for (int j = 0; j < 6; j++)
+                    {
+                        result += map[i, j] + "|";
+
+                    }
+                    result += "\r\n";
+                }
+                result += "\r\n";
+                string path = "./log.txt";
+                try
+                {
+                    File.WriteAllText(path, result);
+                    Console.WriteLine("File written to " + path);
+                }catch (Exception e)
+                {
+                    Console.WriteLine("Error:  " + e.Message);
+                }
+            }
+
             public bool move(int x, char mover)
             {
                 //  Does not assume valid input, but ignores bad input.
@@ -755,7 +784,8 @@ namespace Connect4
                     g.display_win(Game.comp, g);
                     break;
                 }
-            } 
+            }
+            g.log_game();
             Console.ReadKey();
         }
     }
