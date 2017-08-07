@@ -73,23 +73,28 @@ namespace Connect4
             public void log_game()
             {
                 String result;
-                result = "|---------------------------|\r\n";
-                for (int i = 0; i < 7; i++)
+                result = "\r\n";
+                for (int j = 5; j >= 0; j--)
                 {
                     result += "|---------------------------|\r\n";
                     result += "|";
-                    for (int j = 0; j < 6; j++)
+                    for (int i = 0; i < 7; i++)
                     {
-                        result += map[i, j] + "|";
+                        result += " " + map[i, j] + " |";
 
                     }
                     result += "\r\n";
                 }
-                result += "\r\n";
+                result += "|---------------------------|\r\n";
                 string path = "./log.txt";
                 try
                 {
-                    File.WriteAllText(path, result);
+                    DateTime now = new DateTime();
+                    now = DateTime.Now;
+                    result = now.ToLocalTime().ToString() + "\r\n" + result;
+                    string[] content = { result };
+                    //File.WriteAllLines(path, content);
+                    File.AppendAllLines(path, content);
                     Console.WriteLine("File written to " + path);
                 }catch (Exception e)
                 {
